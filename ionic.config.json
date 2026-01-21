@@ -1,0 +1,7 @@
+{
+  "name": "neihouApp/ToneCanto",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}

@@ -1,0 +1,162 @@
+<div class="pitch-compare">
+  <!-- 隐藏的文件输入 -->
+  <input 
+    #fileInput
+    type="file" 
+    accept="audio/*"
+    multiple
+    hidden
+    (change)="onFilesSelected($event)">
+
+  <!-- HTML 图例 - 显示在图表上方 -->
+  @if (visibleTracks().length > 0) {
+    <div class="html-legend">
+      @for (track of visibleTracks(); track track.id) {
+        <div class="legend-item" 
+             [class.playing]="track.isPlaying"
+             (click)="toggleTrack(track.id)">
+          <span class="legend-color-bar" [style.backgroundColor]="track.color"></span>
+          <span class="legend-text">{{ track.name }}</span>
+        </div>
+      }
+      
+      <!-- 依次播放按钮 -->
+      @if (showSequencePlayButton()) {
+        <button class="sequence-play-btn" 
+                [class.playing]="isSequencePlaying()"
+                [disabled]="sequencePlayDisabled()"
+                (click)="sequencePlayClicked.emit(); $event.stopPropagation()">
+          @if (!isSequencePlaying()) {
+            <ion-icon name="play"></ion-icon>
+          } @else {
+            <ion-icon name="pause"></ion-icon>
+          }
+        </button>
+      }
+    </div>
+  }
+
+  <!-- 图表区域 -->
+  <div class="chart-container">
+    <canvas #compareCanvas class="compare-canvas"></canvas>
+    
+    @if (isLoading()) {
+      <div class="loading-overlay">
+        <ion-spinner name="dots"></ion-spinner>
+        <span>分析音频中...</span>
+      </div>
+    }
+  </div>
+
+  <!-- 音轨列表 -->
+  @if (tracks().length > 0 && !simpleMode()) {
+    <div class="tracks-list">
+      @for (track of tracks(); track track.id) {
+        <div class="track-item" 
+             [class.hidden-track]="!track.isVisible" 
+             [class.playing]="track.isPlaying"
+             [class.clickable]="track.isReady"
+             (click)="onTrackClick(track.id, $event)">
+          <!-- 显示/隐藏复选框 -->
+          <button 
+            class="visibility-btn"
+            [class.visible]="track.isVisible"
+            [style.borderColor]="track.color"
+            [style.backgroundColor]="track.isVisible ? track.color : 'transparent'"
+            (click)="toggleTrackVisibility(track.id); $event.stopPropagation()"
+            [disabled]="!track.isReady">
+            @if (track.isVisible) {
+              <ion-icon name="checkmark"></ion-icon>
+            }
+          </button>
+          
+          <div class="track-info">
+            <span class="track-name" [title]="track.name">{{ track.name }}</span>
+            <span class="track-time">{{ formatTime(track.currentTime) }} / {{ formatTime(track.duration) }}</span>
+          </div>
+
+          <div class="track-actions">
+            @if (track.isAnalyzing) {
+              <ion-spinner name="dots"></ion-spinner>
+            } @else if (track.isReady) {
+              <!-- 排序按钮 -->
+              <button 
+                class="action-btn order-btn"
+                (click)="moveTrack(track.id, 'up'); $event.stopPropagation()"
+                [disabled]="tracks().indexOf(track) === 0">
+                <ion-icon name="chevron-up-outline"></ion-icon>
+              </button>
+              <button 
+                class="action-btn order-btn"
+                (click)="moveTrack(track.id, 'down'); $event.stopPropagation()"
+                [disabled]="tracks().indexOf(track) === tracks().length - 1">
+                <ion-icon name="chevron-down-outline"></ion-icon>
+              </button>
+              
+              <button 
+                class="action-btn play-btn"
+                [class.playing]="track.isPlaying"
+                (click)="toggleTrack(track.id); $event.stopPropagation()">
+                <ion-icon [name]="track.isPlaying ? 'pause' : 'play'"></ion-icon>
+              </button>
+            }
+            
+            <button 
+              class="action-btn remove-btn"
+              (click)="removeTrack(track.id); $event.stopPropagation()">
+              <ion-icon name="close"></ion-icon>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- 控制栏 -->
+  @if (!simpleMode()) {
+    <div class="controls">
+    @if (showAddButton()) {
+      <button 
+        class="add-btn"
+        [disabled]="!canAddMore()"
+        (click)="selectFiles()">
+        <ion-icon name="add"></ion-icon>
+        添加音频
+      </button>
+    }
+
+    @if (tracks().length > 0) {
+      <div class="global-controls">
+        <button 
+          class="control-btn"
+          [disabled]="!hasAnyTrack() || isSequencePlaying()"
+          (click)="isAnyPlaying() ? pauseAll() : playAll()">
+          <ion-icon [name]="isAnyPlaying() ? 'pause-circle-outline' : 'play-circle-outline'"></ion-icon>
+          {{ isAnyPlaying() ? '全部暂停' : '全部播放' }}
+        </button>
+
+        <button 
+          class="control-btn"
+          [disabled]="!hasAnyTrack() || isAnyPlaying()"
+          (click)="playSequence()">
+          <ion-icon name="list-outline"></ion-icon>
+          依次播放
+        </button>
+
+        <button 
+          class="control-btn"
+          [disabled]="!hasAnyTrack() && !isSequencePlaying()"
+          (click)="stopAll()">
+          <ion-icon name="stop-outline"></ion-icon>
+        </button>
+
+        <button 
+          class="control-btn danger"
+          (click)="clearAll()">
+          <ion-icon name="trash-outline"></ion-icon>
+        </button>
+      </div>
+    }
+    </div>
+  }
+</div>

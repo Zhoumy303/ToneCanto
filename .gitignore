@@ -1,0 +1,82 @@
+# 依赖
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 构建输出
+www/
+dist/
+build/
+.angular/
+
+# 环境变量（包含敏感信息）
+.env
+.env.local
+.env.*.local
+
+# 操作系统
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/          # 建议不提交，除非有团队配置
+.idea/
+*.swp
+*.swo
+
+# 测试覆盖率
+coverage/
+.nyc_output/
+
+# 临时文件
+tmp/
+temp/
+*.tmp
+*.temp
+
+# android/.gitignore（或在项目根目录细化）
+# ========================================
+
+# ❌ 不提交：构建产物和缓存
+android/app/build/
+android/build/
+android/.gradle/
+android/.idea/
+android/*.iml
+android/app/*.iml
+
+# ❌ 不提交：本地配置文件（包含敏感信息）
+android/local.properties
+android/keystore.properties  # 如果有的话
+android/*.keystore           # 签名文件
+android/*.jks                # 签名文件
+
+# ❌ 不提交：自动生成的文件
+android/captures/
+android/.externalNativeBuild/
+
+# ✅ 提交：源代码和配置
+!android/app/src/main/        # 提交源代码
+!android/app/src/main/java/
+!android/app/src/main/kotlin/
+!android/app/src/main/res/
+!android/app/src/main/assets/
+!android/app/src/main/AndroidManifest.xml
+
+# ✅ 提交：Gradle 配置文件
+!android/build.gradle
+!android/app/build.gradle
+!android/gradle.properties
+!android/gradle/
+!android/gradlew
+!android/gradlew.bat
+!android/settings.gradle
+
+# ✅ 提交：友盟插件相关
+!android/app/libs/           # 如果添加了友盟 SDK jar/aar
+!android/app/src/main/jniLibs/ # 如果添加了 so 文件
+
+同步到手机.sh
+

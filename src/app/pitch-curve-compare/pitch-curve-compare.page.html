@@ -1,0 +1,62 @@
+<ion-content class="pitch-curve-compare-page" [fullscreen]="true" [class]="'theme-' + currentTheme()">
+  <!-- 页面容器 -->
+  <div class="pitch-curve-container">
+    <!-- 顶部标题栏 -->
+    <div class="page-header">
+      <button class="back-btn" (click)="goBack()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      <span class="page-title">音高曲线对比</span>
+      <div class="header-spacer"></div>
+    </div>
+
+    <!-- 加载状态 -->
+    @if (isLoadingAudios() || isAutoLoading()) {
+      <div class="loading-container">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p class="loading-text">正在加载音频...</p>
+      </div>
+    }
+
+    <!-- 错误信息 -->
+    @if (errorMessage()) {
+      <div class="error-container">
+        <ion-icon name="alert-circle" class="error-icon"></ion-icon>
+        <p class="error-text">{{ errorMessage() }}</p>
+      </div>
+    }
+
+    <!-- 音高对比组件 -->
+    <div class="pitch-compare-wrapper">
+      <app-pitch-compare
+        #pitchCompare
+        [height]="400"
+        [maxTracks]="8"
+        [showAddButton]="false"
+        [simpleMode]="true"
+        [showSequencePlayButton]="true"
+        [isSequencePlaying]="isPlayingSequence()"
+        [sequencePlayDisabled]="selectedAudios().length === 0"
+        (sequencePlayClicked)="toggleSequencePlay()"
+        (sequencePlayCompleted)="onSequencePlayCompleted()"
+        (trackAdded)="onTrackAdded($event)"
+        (trackRemoved)="onTrackRemoved($event)"
+        (error)="onError($event)">
+      </app-pitch-compare>
+    </div>
+
+    <!-- 底部信息栏 -->
+    <div class="info-bar">
+      <div class="info-item">
+        <ion-icon name="musical-notes"></ion-icon>
+        <span>{{ selectedAudios().length }} 个音频</span>
+      </div>
+      <div class="info-item">
+        <ion-icon name="information-circle"></ion-icon>
+        <span>当前示例组的所有字符音高曲线</span>
+      </div>
+    </div>
+  </div>
+</ion-content>

@@ -1,0 +1,115 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+    <ion-title>音高对比分析</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="demo-container">
+    <!-- 粤拼输入区域 -->
+    <div class="jyutping-input-section">
+      <h3>输入粤拼</h3>
+      <ion-textarea
+        placeholder="输入粤拼（如：ou1, maa1, gong2）&#10;或不带调值（如：ou, maa, gong）&#10;支持逗号、空格或换行分隔"
+        [(ngModel)]="jyutpingInput"
+        rows="4"
+        class="jyutping-textarea">
+      </ion-textarea>
+      
+      <div class="button-group">
+        <ion-button
+          expand="block"
+          color="primary"
+          (click)="loadAudiosByJyutpings()"
+          [disabled]="isLoadingAudios() || isAutoLoading()">
+          <ion-icon name="search" slot="start"></ion-icon>
+          查询音频
+        </ion-button>
+        <ion-button
+          expand="block"
+          color="medium"
+          (click)="clearAudios()"
+          [disabled]="!hasAudios()">
+          <ion-icon name="trash" slot="start"></ion-icon>
+          清空
+        </ion-button>
+      </div>
+
+      @if (isLoadingAudios() || isAutoLoading()) {
+        <div class="loading-message">
+          <ion-spinner></ion-spinner>
+          <span>{{ isAutoLoading() ? '正在加载音频...' : '正在查询...' }}</span>
+        </div>
+      }
+
+      @if (errorMessage()) {
+        <div class="error-message">
+          <ion-icon name="alert-circle"></ion-icon>
+          <span>{{ errorMessage() }}</span>
+        </div>
+      }
+    </div>
+
+    <!-- 已选择的音频列表 -->
+    @if (hasAudios()) {
+      <div class="selected-audios-section">
+        <h3>已选择的音频 ({{ selectedAudios().length }})</h3>
+        <ion-list>
+          @for (audio of selectedAudios(); track audio.jyutping) {
+            <ion-item>
+              <ion-label>
+                <h2>{{ audio.jyutping }}</h2>
+                <p>{{ audio.format | uppercase }} • {{ (audio.file_size / 1024) | number: '1.0-0' }} KB</p>
+              </ion-label>
+              <ion-button
+                slot="end"
+                fill="clear"
+                color="danger"
+                (click)="removeAudio(audio.jyutping)">
+                <ion-icon name="close"></ion-icon>
+              </ion-button>
+            </ion-item>
+          }
+        </ion-list>
+      </div>
+    }
+
+    <!-- 音高对比组件 -->
+    @if (hasAudios()) {
+      <div class="pitch-compare-section">
+        <h3>音高对比</h3>
+        <app-pitch-compare
+          #pitchCompare
+          [height]="300"
+          [maxTracks]="8"
+          (trackAdded)="onTrackAdded($event)"
+          (trackRemoved)="onTrackRemoved($event)"
+          (error)="onError($event)">
+        </app-pitch-compare>
+      </div>
+    }
+
+    <!-- 使用说明 -->
+    <div class="tips">
+      <h4>使用说明</h4>
+      <ul>
+        <li>在输入框中输入粤拼</li>
+        <li>支持两种输入方式：
+          <ul>
+            <li>带调值：ou1, maa1, gong2</li>
+            <li>不带调值：ou, maa, gong（自动返回所有调值版本）</li>
+          </ul>
+        </li>
+        <li>支持逗号、空格或换行分隔多个粤拼</li>
+        <li>点击「查询音频」按钮</li>
+        <li>系统会自动加载所有音频文件到音高对比图表</li>
+        <li>可以点击「×」按钮移除不需要的音频</li>
+        <li>不同颜色代表不同音频，便于对比</li>
+        <li>可单独播放或同时播放多个音频</li>
+      </ul>
+    </div>
+  </div>
+</ion-content>

@@ -1,0 +1,91 @@
+@if (isOpen()) {
+  <div class="tone-table-modal">
+    <div class="modal-overlay" (click)="close()"></div>
+    <div class="tone-table-modal-content">
+      <div class="modal-header">
+        <span class="modal-title">📊 六声调表</span>
+        <button class="modal-close-btn" (click)="close()">×</button>
+      </div>
+      
+      <div class="tones-table-container">
+        <table class="tones-table">
+          <thead>
+            <tr>
+              <th class="table-header">调名</th>
+              @for (tone of tonesData; track tone.number) {
+                <th class="tone-column"
+                    [class.selected]="selectedTone() === tone.number"
+                    [attr.data-tone]="tone.number"
+                    [style.--tone-color]="tone.color"
+                    [style.--tone-color-rgb]="toneColorRgb[tone.number]"
+                    (click)="selectTone(tone.number)">
+                  {{ tone.name.split(' / ')[1] }}
+                </th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="table-header">调序</td>
+              @for (tone of tonesData; track tone.number) {
+                <td class="tone-number-cell"
+                    [class.selected]="selectedTone() === tone.number"
+                    [attr.data-tone]="tone.number"
+                    [style.--tone-color]="tone.color"
+                    [style.--tone-color-rgb]="toneColorRgb[tone.number]"
+                    (click)="selectTone(tone.number)">
+                  {{ tone.number }}
+                </td>
+              }
+            </tr>
+            
+            <tr>
+              <td class="table-header">调值</td>
+              @for (tone of tonesData; track tone.number) {
+                <td class="tone-value-cell"
+                    [class.selected]="selectedTone() === tone.number"
+                    [attr.data-tone]="tone.number"
+                    [style.--tone-color]="tone.color"
+                    [style.--tone-color-rgb]="toneColorRgb[tone.number]"
+                    (click)="selectTone(tone.number)">
+                  {{ getToneValue(tone.number) }}
+                </td>
+              }
+            </tr>
+
+            @for (pitchLevel of pitchLevels; track pitchLevel) {
+              <tr class="pitch-row" [class]="'pitch-' + pitchLevel">
+                <td class="table-header pitch-scale">{{ pitchLevel }}</td>
+                @for (tone of tonesData; track tone.number) {
+                  <td class="pitch-cell"
+                      [class.selected]="selectedTone() === tone.number"
+                      [attr.data-tone]="tone.number" 
+                      [style.--tone-color]="tone.color"
+                      [style.--tone-color-rgb]="toneColorRgb[tone.number]"
+                      (click)="selectTone(tone.number)">
+                    <div class="pitch-indicator" [class.active]="isPitchActive(tone.number, pitchLevel)"></div>
+                  </td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="modal-footer">
+        <p class="modal-note">点击声调列可播放该声调的例字</p>
+      </div>
+      
+      <!-- 屏幕中央突出显示的字 -->
+      @if (highlightChar()) {
+        <div class="highlight-char-overlay" (click)="hideHighlightChar()">
+          <div class="highlight-char-container" [style.--tone-color]="highlightCharColor()">
+            <span class="highlight-char">{{ highlightChar() }}</span>
+            <span class="highlight-jyutping">{{ highlightJyutping() }}</span>
+            <span class="highlight-tone-name">{{ highlightToneName() }}</span>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}

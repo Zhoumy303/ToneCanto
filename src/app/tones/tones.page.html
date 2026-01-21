@@ -1,0 +1,708 @@
+<ion-content class="tones-page waveform-home" [fullscreen]="true" [class]="'theme-' + currentTheme()">
+  <!-- 波形图首页 - 全屏横屏显示 -->
+  <div class="waveform-home-container">
+    <!-- 例字组滑动选择器 - 靠左垂直居中 -->
+    <div class="group-slider-container"
+         (touchstart)="onSliderTouchStart($event)"
+         (touchmove)="onSliderTouchMove($event)"
+         (touchend)="onSliderTouchEnd()">
+      <div class="group-slider" 
+           [style.transform]="'translateY(' + sliderTranslateY() + 'px)'">
+        @for (group of exampleGroups(); track $index; let rowIdx = $index) {
+          <button class="row-switch-btn"
+                  [class.active]="currentRowIndex() === rowIdx"
+                  [class.playing]="currentRowIndex() === rowIdx && playingChar()"
+                  [class.locked]="!canSwitchToGroup(rowIdx)"
+                  [class.char-btn]="isCharButton(group)"
+                  (click)="trySwitch(rowIdx)"
+                  [title]="group.baseJyutping || group.examples[0]?.char">
+            <span class="btn-text">{{ getGroupButtonText(group) }}</span>
+            @if (!canSwitchToGroup(rowIdx)) {
+              <span class="lock-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12">
+                  <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+                </svg>
+              </span>
+            }
+          </button>
+        }
+      </div>
+      <!-- 滑动指示器 -->
+      @if (exampleGroups().length > 4) {
+        <div class="slider-indicator">
+          <div class="indicator-track">
+            <div class="indicator-thumb" 
+                 [style.top]="(currentRowIndex() / (exampleGroups().length - 1)) * 100 + '%'"></div>
+          </div>
+        </div>
+      }
+      <!-- VIP 标签提示 -->
+      @if (!isVip() && exampleGroups().length > 1) {
+        <div class="vip-hint">
+          <span class="vip-badge">VIP</span>
+          <span class="vip-text">解锁全部</span>
+        </div>
+      }
+    </div>
+    
+    <!-- VIP 引导弹窗 - 左右分布布局 -->
+    @if (showVipModal()) {
+      <div class="vip-modal-overlay" (click)="closeVipModal()">
+        <div class="vip-modal-container" (click)="$event.stopPropagation()">
+          <!-- 关闭按钮 -->
+          <button class="vip-close-btn" (click)="closeVipModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+          
+          <!-- 左侧内容区 -->
+          <div class="vip-left-content">
+            <div class="vip-badge-tag">🔥 新版本开发中...</div>
+            <h1 class="vip-main-title">ToneCanto，一眼看透九声六调</h1>
+            <p class="vip-main-desc">
+              一次性解锁全部核心学习资源与未来更新，让你的粤语学习投资一劳永逸。
+            </p>
+            <ul class="vip-features-list">
+              <li class="vip-feature-item">
+                <div class="vip-icon-permanent">永</div>
+                <div><strong>例字资源</strong> {{ exampleGroups().length }}+组精选例字库及持续新增内容</div>
+              </li>
+              <li class="vip-feature-item">
+                <div class="vip-icon-permanent">永</div>
+                <div><strong>听音辨调</strong> 所有挑战模式与学习报告</div>
+              </li>
+              <li class="vip-feature-item">
+                <div class="vip-icon-permanent">永</div>
+                <div><strong>发音矫正</strong> 可视化对比你与基础声调的发音</div>
+              </li>
+            </ul>
+            <div class="vip-statistics">
+              <div class="vip-stat-item">
+                <span class="vip-stat-number">{{ exampleGroups().length * 6 }}+</span>
+                <span class="vip-stat-label">例字资源</span>
+              </div>
+              <div class="vip-stat-item">
+                <span class="vip-stat-number">无限次数</span>
+                <span class="vip-stat-label">听音辨调挑战</span>
+              </div>
+              <div class="vip-stat-item">
+                <span class="vip-stat-number">实时反馈</span>
+                <span class="vip-stat-label">发音矫正练习</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 右侧订阅区 -->
+          <div class="vip-right-content">
+            <div class="subscribe-section">
+              <div class="subscribe-header">
+                <span class="subscribe-icon">📧</span>
+                <span class="subscribe-title">获取更新通知</span>
+              </div>
+              <p class="subscribe-description">
+                第一时间获取新版本发布通知和功能更新
+              </p>
+              <div class="subscribe-form">
+                <input 
+                  type="email" 
+                  class="subscribe-input" 
+                  placeholder="输入邮箱地址"
+                  [(ngModel)]="subscribeEmail"
+                  (keyup.enter)="subscribeToUpdates()">
+                <button 
+                  class="subscribe-btn" 
+                  (click)="subscribeToUpdates()"
+                  [disabled]="!isValidEmail(subscribeEmail)">
+                  订阅更新
+                </button>
+              </div>
+              <div class="subscribe-benefits">
+                <div class="benefit-item">
+                  <span class="benefit-icon">🚀</span>
+                  <span class="benefit-text">新功能抢先体验</span>
+                </div>
+                <div class="benefit-item">
+                  <span class="benefit-icon">🎁</span>
+                  <span class="benefit-text">专属优惠活动</span>
+                </div>
+                <div class="benefit-item">
+                  <span class="benefit-icon">📚</span>
+                  <span class="benefit-text">学习资源更新</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+    
+    <!-- 顶部工具栏 - 扁平式菜单 -->
+    <div class="home-toolbar">
+      <!-- 左侧操作按钮 -->
+      <div class="toolbar-left">
+        <button class="flat-btn" (click)="openToneTableModal()">
+          <svg class="flat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <line x1="3" y1="9" x2="21" y2="9"/>
+            <line x1="3" y1="15" x2="21" y2="15"/>
+            <line x1="9" y1="3" x2="9" y2="21"/>
+          </svg>
+          <span>声调表</span>
+        </button>
+      </div>
+      
+      <!-- 右侧按钮 -->
+      <div class="toolbar-right">
+        <!-- 语音选择下拉 -->
+        <div class="voice-selector-wrapper">
+          <button class="flat-btn voice-btn" (click)="toggleVoiceSelector()">
+            <svg class="flat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+              <line x1="12" y1="19" x2="12" y2="23"/>
+              <line x1="8" y1="23" x2="16" y2="23"/>
+            </svg>
+            <span class="voice-name">{{ voiceSelectionService.currentVoice()?.name || '语音' }}</span>
+            <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="currentColor" width="12" height="12">
+              <path d="M7 10l5 5 5-5z"/>
+            </svg>
+          </button>
+          
+          <!-- 语音下拉列表 -->
+          @if (showVoiceSelector()) {
+            <div class="voice-dropdown">
+              <div class="voice-dropdown-header">
+                <span>选择语音</span>
+                <button class="voice-dropdown-close" (click)="closeVoiceSelector()">×</button>
+              </div>
+              <div class="voice-list">
+                @for (voice of voiceSelectionService.voices(); track voice.id) {
+                  <div class="voice-item" 
+                       [class.active]="voiceSelectionService.currentVoice()?.id === voice.id"
+                       [class.human-voice]="voice.type === 'human'"
+                       (click)="selectVoice(voice.id)">
+                    @if (voice.type === 'human') {
+                      <span class="voice-type-badge human">真人</span>
+                    }
+                    <span class="voice-item-name">{{ voice.name }}</span>
+                    @if (voice.type !== 'human') {
+                      <button class="voice-preview-btn" (click)="previewVoice(voice, $event)" title="试听">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+                          <polygon points="5 3 19 12 5 21 5 3"/>
+                        </svg>
+                      </button>
+                    }
+                    @if (voiceSelectionService.currentVoice()?.id === voice.id) {
+                      <span class="voice-check">✓</span>
+                    }
+                  </div>
+                } @empty {
+                  <div class="voice-empty">暂无可用语音</div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+        
+        <!-- 播放速度选择 -->
+        <div class="speed-selector-wrapper">
+          <button class="flat-btn speed-btn" (click)="toggleSpeedSelector()">
+            <svg class="flat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <span class="speed-value">{{ playbackSpeedService.playbackSpeed() }}x</span>
+            <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="currentColor" width="12" height="12">
+              <path d="M7 10l5 5 5-5z"/>
+            </svg>
+          </button>
+          
+          <!-- 速度下拉列表 -->
+          @if (showSpeedSelector()) {
+            <div class="speed-dropdown">
+              <div class="speed-dropdown-header">
+                <span>播放速度</span>
+                <button class="speed-dropdown-close" (click)="closeSpeedSelector()">×</button>
+              </div>
+              <div class="speed-list">
+                @for (speed of playbackSpeedService.speedOptions; track speed) {
+                  <div class="speed-item" 
+                       [class.active]="playbackSpeedService.playbackSpeed() === speed"
+                       (click)="selectSpeed(speed)">
+                    <span class="speed-item-label">{{ speed }}x</span>
+                    @if (speed === 1.0) {
+                      <span class="speed-default-badge">标准</span>
+                    }
+                    @if (playbackSpeedService.playbackSpeed() === speed) {
+                      <span class="speed-check">✓</span>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+        
+        <button class="flat-btn icon-only" (click)="openThemeSelector()">
+          <svg class="flat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    
+    <!-- 右侧边栏按钮 - 听/辨 -->
+    <div class="side-action-buttons">
+      <button class="side-action-btn" (click)="replayWaveform()">
+        <svg class="side-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="5 3 19 12 5 21 5 3" fill="currentColor"/>
+        </svg>
+        <span>听</span>
+      </button>
+      @if (currentRowExamples().length > 0) {
+        <button class="side-action-btn" (click)="startChallenge()">
+          <svg class="side-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 8.5a6.5 6.5 0 1 1 13 0c0 6-6 6-6 10.5"/>
+            <path d="M12 19v3"/>
+          </svg>
+          <span>辨</span>
+        </button>
+      }
+    </div>
+
+    
+    <!-- 波形画布 - 居中显示 -->
+    <div class="waveform-canvas"
+         (touchstart)="on3DGestureStart($event)"
+         (touchmove)="on3DGestureMove($event)"
+         (touchend)="on3DGestureEnd()">
+      
+      <!-- 左下角音高曲线图按钮 -->
+      <button class="pitch-curve-btn" 
+              [class.disabled]="voiceSelectionService.currentVoice()?.type !== 'human'"
+              (click)="openPitchCurveComparison()"
+              title="查看音高曲线对比">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 17 L7 13 L11 15 L15 9 L19 11 L21 7"/>
+          <circle cx="3" cy="17" r="1.5" fill="currentColor"/>
+          <circle cx="7" cy="13" r="1.5" fill="currentColor"/>
+          <circle cx="11" cy="15" r="1.5" fill="currentColor"/>
+          <circle cx="15" cy="9" r="1.5" fill="currentColor"/>
+          <circle cx="19" cy="11" r="1.5" fill="currentColor"/>
+          <circle cx="21" cy="7" r="1.5" fill="currentColor"/>
+        </svg>
+      </button>
+      <svg #waveformSvg id="waveformSvg" viewBox="0 0 750 250" preserveAspectRatio="xMidYMid meet">
+        <!-- 音高刻度线 -->
+        <g class="pitch-grid">
+          <line x1="70" y1="70" x2="680" y2="70" stroke="#94a3b8" stroke-width="1.5"/>
+          <line x1="70" y1="102" x2="680" y2="102" stroke="#94a3b8" stroke-width="1.5"/>
+          <line x1="70" y1="134" x2="680" y2="134" stroke="#94a3b8" stroke-width="1.5"/>
+          <line x1="70" y1="166" x2="680" y2="166" stroke="#94a3b8" stroke-width="1.5"/>
+          <line x1="70" y1="198" x2="680" y2="198" stroke="#94a3b8" stroke-width="1.5"/>
+        </g>
+        
+        <!-- 音高刻度标签 -->
+        <g class="pitch-labels">
+          <text x="55" y="75" text-anchor="end" fill="#3b82f6" font-size="14" font-weight="600">5</text>
+          <text x="55" y="107" text-anchor="end" fill="#3b82f6" font-size="14" font-weight="600">4</text>
+          <text x="55" y="139" text-anchor="end" fill="#3b82f6" font-size="14" font-weight="600">3</text>
+          <text x="55" y="171" text-anchor="end" fill="#3b82f6" font-size="14" font-weight="600">2</text>
+          <text x="55" y="203" text-anchor="end" fill="#3b82f6" font-size="14" font-weight="600">1</text>
+        </g>
+
+        <!-- 字符波形路径和标记 -->
+        <g id="characterMarkers">
+          @for (marker of characterMarkers(); track marker.index; let i = $index) {
+            <!-- 波形路径 -->
+            <path [attr.d]="marker.path"
+                  [attr.stroke]="marker.color"
+                  stroke-width="4"
+                  fill="none"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="character-waveform-path animating"
+                  [class.loop-animating]="marker.isLoopAnimating"
+                  [style.--path-length]="marker.pathLength + 'px'"
+                  [style.stroke-dasharray]="marker.pathLength"
+                  [style.animation-delay]="marker.animationDelay + 's'"/>
+            
+            <!-- 粤拼文字 - 显示在字符圆圈上方 -->
+            <text [attr.x]="marker.centerX"
+                  [attr.y]="marker.centerY - 32"
+                  class="jyutping-text"
+                  [style.animation-delay]="marker.animationDelay + 's'"
+                  text-anchor="middle"
+                  dominant-baseline="central"
+                  [attr.fill]="marker.color"
+                  font-size="12" font-weight="600">
+              {{ marker.jyutping }}
+            </text>
+            
+            <!-- 字符圆圈 - 单击播放，双击打开纠错页，长按标记ABC点 -->
+            <g class="character-marker clickable" 
+               [class.loop-animating]="marker.isLoopAnimating"
+               [class.playing]="playingChar() === marker.char"
+               [class.compare-point]="comparePoints().includes(i)"
+               [class.challenge-mode]="isChallengeMode()"
+               [class.challenge-correct]="isChallengeMode() && challengeFeedback() !== null && i === challengeCorrectIndex()"
+               [class.challenge-wrong]="isChallengeMode() && challengeFeedback() === 'incorrect' && i === challengeUserChoice()"
+               [style.animation-delay]="marker.animationDelay + 's'"
+               (click)="onCharClick(marker, i, $event)"
+               (mousedown)="onCharLongPressStart(i, $event)"
+               (mouseup)="onCharLongPressEnd($event)"
+               (mouseleave)="onCharLongPressEnd($event)"
+               (touchstart)="onCharLongPressStart(i, $event)"
+               (touchend)="onCharLongPressEnd($event)"
+               (touchcancel)="onCharLongPressEnd($event)">
+              <circle [attr.cx]="marker.centerX"
+                      [attr.cy]="marker.centerY"
+                      r="20"
+                      [attr.fill]="marker.color"
+                      stroke="white" stroke-width="3"/>
+              <text [attr.x]="marker.centerX"
+                    [attr.y]="marker.centerY + 1"
+                    text-anchor="middle"
+                    dominant-baseline="central"
+                    fill="white" font-size="16" font-weight="bold">
+                {{ marker.char }}
+              </text>
+              <!-- AB 标记 -->
+              @if (getCompareLabel(i)) {
+                <g class="compare-label">
+                  <circle [attr.cx]="marker.centerX + 16"
+                          [attr.cy]="marker.centerY - 16"
+                          r="10"
+                          [attr.fill]="comparePoints().indexOf(i) === 0 ? '#ef4444' : (comparePoints().indexOf(i) === 1 ? '#3b82f6' : '#10b981')"
+                          stroke="white" stroke-width="2"/>
+                  <text [attr.x]="marker.centerX + 16"
+                        [attr.y]="marker.centerY - 16"
+                        text-anchor="middle"
+                        dominant-baseline="central"
+                        fill="white" font-size="11" font-weight="bold">
+                    {{ getCompareLabel(i) }}
+                  </text>
+                </g>
+              }
+            </g>
+            
+            <!-- 正确答案标记 - 大 ✓ 覆盖在字上（白色描边更醒目） -->
+            @if (isChallengeMode() && challengeFeedback() !== null && i === challengeCorrectIndex()) {
+              <text class="correct-check-mark"
+                    [attr.x]="marker.centerX"
+                    [attr.y]="marker.centerY + 5"
+                    text-anchor="middle"
+                    dominant-baseline="central"
+                    fill="#22c55e"
+                    stroke="white"
+                    stroke-width="3"
+                    paint-order="stroke"
+                    font-size="70" 
+                    font-weight="bold">✓</text>
+            }
+            
+            <!-- 错误答案标记 - 大 ✗ 覆盖在字上 -->
+            @if (isChallengeMode() && challengeFeedback() === 'incorrect' && i === challengeUserChoice() && i !== challengeCorrectIndex()) {
+              <text class="wrong-check-mark"
+                    [attr.x]="marker.centerX"
+                    [attr.y]="marker.centerY + 5"
+                    text-anchor="middle"
+                    dominant-baseline="central"
+                    fill="#ef4444"
+                    stroke="white"
+                    stroke-width="3"
+                    paint-order="stroke"
+                    font-size="60" 
+                    font-weight="bold">✗</text>
+            }
+            
+            <!-- 含义文字 -->
+            <g class="meaning-group" 
+               [style.animation-delay]="(marker.animationDelay + 0.15) + 's'"
+               (click)="playMeaning(marker.meaning, marker.char); $event.stopPropagation()">
+              <rect [attr.x]="marker.centerX - 20"
+                    [attr.y]="marker.centerY + 25"
+                    width="40" height="16" rx="3"
+                    class="meaning-bg" fill="transparent"/>
+              <text [attr.x]="marker.centerX"
+                    [attr.y]="marker.centerY + 35"
+                    class="meaning-text"
+                    text-anchor="middle" fill="#4a5568"
+                    font-size="11" font-weight="500"
+                    style="cursor: pointer;">
+                {{ marker.meaning }}
+              </text>
+            </g>
+          }
+        </g>
+      </svg>
+      
+      <!-- ABC 对比提示 - 浮动在波形图上方 -->
+      @if (comparePoints().length > 0 && !showPracticeReport()) {
+        <div class="compare-hint-float">
+          <!-- 右上角关闭按钮 -->
+          <button class="compare-close-btn" (click)="clearComparePoints()">×</button>
+          <div class="compare-hint-row">
+            <span class="hint-text">
+              @for (idx of comparePoints(); track idx; let i = $index) {
+                <span class="compare-point-label"
+                      [style.color]="characterMarkers()[idx]?.color">
+                  {{ ['A','B','C'][i] }}: {{ characterMarkers()[idx]?.char }}
+                </span>
+              }
+              @if (comparePoints().length < 2) {
+                <span class="hint-tip">再长按选择对比点</span>
+              }
+            </span>
+            <div class="compare-actions">
+              <button class="compare-action-btn" 
+                      [class.disabled]="!canCompare()"
+                      [class.playing]="isComparePlaying()"
+                      (click)="onCompareButtonClick()">
+                @if (!isComparePlaying()) {
+                  <ion-icon name="play"></ion-icon>
+                } @else {
+                  <ion-icon name="pause"></ion-icon>
+                }
+                <span>{{ isComparePlaying() ? '停止' : '播放' }}</span>
+              </button>
+            </div>
+          </div>
+          <!-- 播放选项 -->
+          <div class="compare-options">
+            <label class="option-item" (click)="toggleComparePlayWithMeaning()">
+              <span class="option-checkbox" [class.checked]="comparePlayWithMeaning()">✓</span>
+              <span class="option-label">听词</span>
+            </label>
+            <label class="option-item" (click)="toggleCompareLoopPlay()">
+              <span class="option-checkbox" [class.checked]="compareLoopPlay()">✓</span>
+              <span class="option-label">循环</span>
+            </label>
+          </div>
+        </div>
+      }
+      
+      <!-- 挑战模式浮动提示 -->
+      @if (isChallengeMode()) {
+        <div class="challenge-float">
+          <!-- 右上角关闭按钮 -->
+          <button class="challenge-float-close" (click)="endChallenge()">×</button>
+          <div class="challenge-float-header">
+            <span class="challenge-float-title">🎧 听音辨调</span>
+            @if (practiceStats().totalQuestions > 0) {
+              <div class="challenge-float-stats">
+                <span class="stats-correct">{{ practiceStats().correctCount }}</span>
+                <span class="stats-divider">/</span>
+                <span class="stats-total">{{ practiceStats().totalQuestions }}</span>
+              </div>
+            }
+          </div>
+          
+          <div class="challenge-float-content">
+            @if (challengeFeedback() === null) {
+              <span class="challenge-hint">点击你听到的字</span>
+              <button class="replay-btn" (click)="replayChallengeAudio()">🔊 再听一次</button>
+            } @else if (challengeFeedback() === 'correct') {
+              <span class="feedback-correct">✅ 正确！</span>
+              <button class="next-btn" (click)="continueChallenge()">下一题</button>
+            } @else {
+              <span class="feedback-incorrect">
+                ❌ 错了，是「{{ currentRowExamples()[challengeCorrectIndex()!]?.char }}」
+              </span>
+              <button class="next-btn" (click)="continueChallenge()">下一题</button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    
+    <!-- 练习报告面板 - 横屏布局 -->
+    @if (showPracticeReport()) {
+      <div class="practice-report-panel">
+        <div class="report-header">
+          <ion-icon name="bar-chart-outline" class="report-icon"></ion-icon>
+          <span class="report-title">练习报告</span>
+          <button class="report-close-btn" (click)="closePracticeReport()">×</button>
+        </div>
+        
+        <div class="report-body">
+          <!-- 左侧：统计数据 -->
+          <div class="report-left">
+            <div class="report-stats">
+              <div class="stat-card">
+                <span class="stat-value">{{ practiceStats().totalQuestions }}</span>
+                <span class="stat-label">总题数</span>
+              </div>
+              <div class="stat-card correct">
+                <span class="stat-value">{{ practiceStats().correctCount }}</span>
+                <span class="stat-label">正确</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-value">{{ practiceAccuracy() }}%</span>
+                <span class="stat-label">正确率</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-value">{{ practiceTime() }}s</span>
+                <span class="stat-label">用时</span>
+              </div>
+            </div>
+            
+            <!-- 已掌握 -->
+            @if (masteredTones().length > 0) {
+              <div class="mastered-section">
+                <span class="mastered-text">
+                  ✅ 已掌握第 {{ masteredTones().join('、') }} 声
+                </span>
+              </div>
+            }
+            
+            <!-- 操作按钮 -->
+            <div class="report-actions">
+              <button class="restart-btn" (click)="restartPractice()">
+                <span>🔄 重新练习</span>
+              </button>
+            </div>
+          </div>
+          
+          <!-- 右侧：混淆热点 -->
+          @if (topConfusionPairs().length > 0) {
+            <div class="report-right">
+              <p class="section-title">🔥 混淆热点 <span class="click-hint">(点击查看建议)</span></p>
+              <div class="confusion-list">
+                @for (pair of topConfusionPairs(); track pair.pair) {
+                  <div class="confusion-item clickable" 
+                       (click)="openAdviceModal(pair.pair, pair.tones)">
+                    <div class="confusion-info">
+                      <span class="confusion-tones">
+                        第{{ pair.tones[0] }}声 ↔ 第{{ pair.tones[1] }}声
+                      </span>
+                      @if (pair.chars.length > 0) {
+                        <span class="confusion-chars">
+                          「{{ pair.chars.join('、') }}」
+                        </span>
+                      }
+                    </div>
+                    <div class="confusion-right">
+                      <span class="confusion-count">{{ pair.count }}次</span>
+                      <span class="arrow-icon">›</span>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          } @else {
+            <!-- 无错误时显示 -->
+            <div class="report-right no-errors">
+              <span class="perfect-icon">🎉</span>
+              <span class="perfect-text">全部正确！</span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+    
+    <!-- 指导建议弹窗 - 横屏布局 -->
+    @if (showAdviceModal()) {
+      <div class="advice-modal-overlay" (click)="closeAdviceModal()">
+        <div class="advice-modal" (click)="$event.stopPropagation()">
+          <div class="advice-modal-header">
+            <span class="advice-title">📖 辨音指导</span>
+            <button class="advice-close-btn" (click)="closeAdviceModal()">×</button>
+          </div>
+          
+          @if (selectedConfusionPair()) {
+            <div class="advice-modal-body">
+              <!-- 左侧：问题诊断 -->
+              <div class="advice-diagnosis">
+                <span class="diagnosis-label">问题诊断</span>
+                <p class="diagnosis-content">{{ getConfusionDiagnosis(selectedConfusionPair()!.pair).diagnosis }}</p>
+              </div>
+              
+              <!-- 右侧：指导建议 -->
+              <div class="advice-section">
+                <span class="advice-label">💡 指导建议</span>
+                <div class="advice-cards">
+                  @for (advice of getConfusionDiagnosis(selectedConfusionPair()!.pair).advice; track advice) {
+                    <div class="advice-card">
+                      <p class="advice-text">{{ advice }}</p>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+            
+            <!-- 底部按钮 -->
+            <div class="advice-modal-footer">
+              <button class="practice-btn" (click)="goToCompareTraining()">
+                🎯 强化练习：第{{ selectedConfusionPair()!.tones[0] }}声 vs 第{{ selectedConfusionPair()!.tones[1] }}声
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- 音高曲线引导弹窗 -->
+    @if (showPitchCurveGuideModal()) {
+      <div class="pitch-curve-guide-overlay" (click)="closePitchCurveGuideModal()">
+        <div class="pitch-curve-guide-modal" (click)="$event.stopPropagation()">
+          <div class="guide-header">
+            <span class="guide-title">🎤 需要真人发音</span>
+            <button class="guide-close-btn" (click)="closePitchCurveGuideModal()">×</button>
+          </div>
+          
+          <div class="guide-body">
+            <div class="guide-icon">🔊</div>
+            <p class="guide-text">
+              音高曲线对比功能需要使用<strong>真人发音</strong>才能正常工作。
+            </p>
+            <p class="guide-description">
+              真人发音能提供更准确的音高参考，帮助你更好地对比和改进发音。
+            </p>
+          </div>
+          
+          <div class="guide-footer">
+            <button class="guide-btn cancel" (click)="closePitchCurveGuideModal()">
+              稍后再说
+            </button>
+            <button class="guide-btn primary" (click)="goToSelectHumanVoice()">
+              👆 去选择真人发音
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- 右下角用户按钮 -->
+  <div class="user-button-container">
+    @if (currentUser()) {
+      <!-- 已登录用户 -->
+      <button class="user-avatar-btn" (click)="goToProfile()">
+        @if (currentUser()!.avatar) {
+          <img class="user-avatar" [src]="currentUser()!.avatar" [alt]="currentUser()!.nickname">
+        } @else {
+          <div class="user-avatar-placeholder">
+            {{ currentUser()!.nickname.charAt(0) || '我' }}
+          </div>
+        }
+        <span class="user-name">{{ currentUser()!.nickname || '我的' }}</span>
+      </button>
+    } @else {
+      <!-- 未登录用户 -->
+      <button class="login-btn" (click)="showVipModal.set(true)">
+        <svg class="login-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 16v-4"/>
+          <path d="M12 8h.01"/>
+        </svg>
+        <span class="login-text">关于</span>
+      </button>
+    }
+  </div>
+
+</ion-content>

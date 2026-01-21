@@ -1,0 +1,54 @@
+<ion-content class="theme-selector-page" [fullscreen]="true" [class]="'theme-' + themeService.currentTheme()">
+  <div class="theme-selector-container">
+    <!-- 顶部标题栏 -->
+    <div class="page-header">
+      <button class="back-btn" (click)="goBack()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      <span class="page-title">🎨 选择主题</span>
+      <div class="header-spacer"></div>
+    </div>
+
+    <!-- 随机主题开关 -->
+    <div class="random-toggle-section">
+      <label class="random-label" (click)="toggleRandomTheme()">
+        <span class="toggle-checkbox" [class.checked]="themeService.randomTheme()">
+          @if (themeService.randomTheme()) {
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+            </svg>
+          }
+        </span>
+        <span class="random-text">每次进入页面随机切换主题</span>
+      </label>
+    </div>
+
+    <!-- 主题网格 -->
+    <div class="theme-grid" [class.disabled]="themeService.randomTheme()">
+      @for (theme of themeService.themes; track theme.id) {
+        <button class="theme-card"
+                [class.active]="themeService.currentTheme() === theme.id"
+                [disabled]="themeService.randomTheme()"
+                (click)="selectTheme(theme.id)">
+          <div class="theme-preview" [style.background]="getSafeGradient(theme.gradient)">
+            @if (themeService.currentTheme() === theme.id) {
+              <div class="check-mark">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                </svg>
+              </div>
+            }
+          </div>
+          <span class="theme-name">{{ theme.name }}</span>
+        </button>
+      }
+    </div>
+
+    <!-- 底部提示 -->
+    <div class="page-footer">
+      <p class="footer-note">主题设置会自动保存</p>
+    </div>
+  </div>
+</ion-content>

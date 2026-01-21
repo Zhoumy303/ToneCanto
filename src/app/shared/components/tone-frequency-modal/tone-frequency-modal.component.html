@@ -1,0 +1,83 @@
+@if (isOpen()) {
+  <div class="tone-frequency-modal">
+    <div class="modal-overlay" (click)="close()"></div>
+    <div class="modal-content">
+      <!-- 标题栏 -->
+      <div class="modal-header">
+        <span class="modal-title">
+          <ion-icon name="pulse-outline"></ion-icon>
+          声调频率参考
+        </span>
+        
+        <!-- 性别切换按钮 -->
+        <div class="gender-toggle">
+          <button class="gender-btn male-btn" 
+                  [class.active]="selectedGender() === 'male'"
+                  (click)="selectGender('male')">
+            <ion-icon name="male-outline"></ion-icon>
+            <span>男声</span>
+            <span class="freq-hint">110-200Hz</span>
+          </button>
+          <button class="gender-btn female-btn"
+                  [class.active]="selectedGender() === 'female'"
+                  (click)="selectGender('female')">
+            <ion-icon name="female-outline"></ion-icon>
+            <span>女声</span>
+            <span class="freq-hint">180-300Hz</span>
+          </button>
+        </div>
+        
+        <button class="modal-close-btn" (click)="close()">×</button>
+      </div>
+
+      <!-- 声调表 -->
+      <div class="modal-body">
+        <table class="tones-table">
+          <thead>
+            <tr>
+              <th class="col-number">调</th>
+              <th class="col-example">例字</th>
+              <th class="col-name">调名</th>
+              <th class="col-freq">频率范围</th>
+              <th class="col-desc">描述</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (tone of tonesData; track tone.number) {
+              <tr [class.short-tone]="tone.isShort">
+                <td class="col-number tone-number">{{ tone.number }}</td>
+                <td class="col-example">{{ tone.example }}</td>
+                <td class="col-name">{{ tone.name }}</td>
+                <td class="col-freq">
+                  <div class="freq-bar" [class.male-bar]="selectedGender() === 'male'" [class.female-bar]="selectedGender() === 'female'">
+                    <div class="bar-fill" [style.width.%]="selectedGender() === 'male' ? tone.malePercent : tone.femalePercent"></div>
+                    <span class="bar-label">{{ selectedGender() === 'male' ? tone.maleRange : tone.femaleRange }}</span>
+                  </div>
+                </td>
+                <td class="col-desc">{{ tone.desc }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 底部提示 -->
+      <div class="modal-footer">
+        <div class="guide-tips">
+          <div class="tip-item">
+            <span class="tip-number">1</span>
+            <span class="tip-text"><strong>先定锚点</strong>：发"试(si3)"找中平调基准</span>
+          </div>
+          <div class="tip-item">
+            <span class="tip-number">2</span>
+            <span class="tip-text"><strong>上下推算</strong>：以此找更高、更低的调</span>
+          </div>
+          <div class="tip-item">
+            <span class="tip-number">3</span>
+            <span class="tip-text"><strong>重在对比</strong>：关键在相对关系</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
