@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Capacitor Preferences</title>
+</head>
+<body>
+    <h1>Test Capacitor Preferences</h1>
+    <button onclick="testSave()">Test Save</button>
+    <button onclick="testLoad()">Test Load</button>
+    <button onclick="showLocalStorage()">Show LocalStorage</button>
+    <div id="output"></div>
+
+    <script type="module">
+        import { Preferences } from '@capacitor/preferences';
+
+        window.testSave = async function() {
+            try {
+                console.log('Testing save...');
+                await Preferences.set({
+                    key: 'test_recording',
+                    value: JSON.stringify({ test: 'data', timestamp: Date.now() })
+                });
+                document.getElementById('output').innerHTML = 'Saved successfully!';
+                console.log('Save successful');
+            } catch (error) {
+                console.error('Save failed:', error);
+                document.getElementById('output').innerHTML = 'Save failed: ' + error.message;
+            }
+        };
+
+        window.testLoad = async function() {
+            try {
+                console.log('Testing load...');
+                const result = await Preferences.get({ key: 'test_recording' });
+                document.getElementById('output').innerHTML = 'Loaded: ' + result.value;
+                console.log('Load result:', result);
+            } catch (error) {
+                console.error('Load failed:', error);
+                document.getElementById('output').innerHTML = 'Load failed: ' + error.message;
+            }
+        };
+
+        window.showLocalStorage = function() {
+            const keys = Object.keys(localStorage);
+            const output = keys.map(key => `${key}: ${localStorage.getItem(key)}`).join('<br>');
+            document.getElementById('output').innerHTML = output || 'LocalStorage is empty';
+            console.log('LocalStorage keys:', keys);
+        };
+    </script>
+</body>
+</html>

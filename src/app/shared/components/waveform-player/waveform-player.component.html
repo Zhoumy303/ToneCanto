@@ -1,0 +1,57 @@
+<div class="waveform-player">
+  <!-- 合并的音高+音量图表 -->
+  <div class="chart-container">
+    <canvas 
+      #analysisCanvas 
+      class="analysis-canvas"
+      (click)="onCanvasClick($event)">
+    </canvas>
+    
+    @if (isAnalyzing()) {
+      <div class="analyzing-overlay">
+        <ion-spinner name="dots"></ion-spinner>
+        <span>分析音频中... {{ analysisProgress() }}%</span>
+      </div>
+    }
+  </div>
+
+  <!-- 加载状态 -->
+  @if (isLoading()) {
+    <div class="loading-overlay">
+      <ion-spinner name="crescent"></ion-spinner>
+      <span>加载中...</span>
+    </div>
+  }
+
+  <!-- 错误提示 -->
+  @if (error()) {
+    <div class="error-overlay">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  <!-- 控制栏 -->
+  <div class="controls">
+    <button 
+      class="play-btn" 
+      (click)="togglePlayPause()"
+      [disabled]="isLoading() || !!error()">
+      <ion-icon [name]="isPlaying() ? 'pause' : 'play'"></ion-icon>
+    </button>
+
+    <div class="time-display">
+      <span class="current-time">{{ formatTime(currentTime()) }}</span>
+      <span class="separator">/</span>
+      <span class="duration">{{ formatTime(duration()) }}</span>
+    </div>
+
+    <!-- 进度条 -->
+    <div class="progress-bar">
+      <div 
+        class="progress-fill" 
+        [style.width.%]="duration() > 0 ? (currentTime() / duration()) * 100 : 0">
+      </div>
+    </div>
+  </div>
+</div>

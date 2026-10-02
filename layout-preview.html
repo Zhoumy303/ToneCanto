@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToneCanto - 新布局预览</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a14 0%, #1a1a2e 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .preview-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .preview-title {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 30px;
+            color: #10b981;
+        }
+        
+        .layout-demo {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+            max-width: 900px;
+            margin: 0 auto;
+            min-height: 500px;
+        }
+        
+        .left-content {
+            flex: 1.2;
+            padding: 24px 28px;
+            background: linear-gradient(to bottom right, #f8f9ff, #edf2ff);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .badge-tag {
+            display: inline-block;
+            background: linear-gradient(90deg, #FF8A00, #FF3366);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 14px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            align-self: flex-start;
+            box-shadow: 0 2px 8px rgba(255, 51, 102, 0.3);
+        }
+        
+        .main-title {
+            color: #1a237e;
+            font-size: 22px;
+            font-weight: 800;
+            margin: 0 0 10px 0;
+            line-height: 1.3;
+        }
+        
+        .main-desc {
+            color: #5a6378;
+            font-size: 13px;
+            margin: 0 0 16px 0;
+            line-height: 1.5;
+        }
+        
+        .features-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 16px 0;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 8px;
+            color: #2d3748;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        
+        .feature-item strong {
+            color: #1a237e;
+        }
+        
+        .icon-permanent {
+            width: 18px;
+            height: 18px;
+            background: #4a148c;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            flex-shrink: 0;
+            color: white;
+            font-weight: bold;
+            font-size: 9px;
+        }
+        
+        .statistics {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 12px;
+            margin-top: auto;
+            border-top: 1px dashed #e2e8f0;
+        }
+        
+        .stat-item {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .stat-number {
+            display: block;
+            font-size: 18px;
+            font-weight: 800;
+            color: #1a237e;
+        }
+        
+        .stat-label {
+            font-size: 11px;
+            color: #718096;
+            margin-top: 2px;
+        }
+        
+        .right-content {
+            flex: 0 0 320px;
+            background: linear-gradient(145deg, #0d1526, #1a0b2e);
+            color: white;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .subscribe-section {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .subscribe-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+        
+        .subscribe-icon {
+            font-size: 18px;
+        }
+        
+        .subscribe-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .subscribe-description {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.8);
+            margin: 0;
+            line-height: 1.4;
+        }
+        
+        .subscribe-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .subscribe-input {
+            padding: 12px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .subscribe-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .subscribe-btn {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        
+        .subscribe-benefits {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid #3b82f6;
+        }
+        
+        .benefit-icon {
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        
+        .benefit-text {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            color: rgba(0, 0, 0, 0.6);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .improvements {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        
+        .improvements h3 {
+            color: #10b981;
+            margin-top: 0;
+        }
+        
+        .improvements ul {
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+        }
+        
+        @media (max-width: 768px) {
+            .layout-demo {
+                flex-direction: column;
+                max-width: 95%;
+            }
+            
+            .right-content {
+                flex: 0 0 auto;
+                padding: 20px;
+            }
+            
+            .left-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="preview-container">
+        <h1 class="preview-title">🎉 ToneCanto 新布局预览</h1>
+        
+        <div class="layout-demo" style="position: relative;">
+            <button class="close-btn">×</button>
+            
+            <!-- 左侧内容区 -->
+            <div class="left-content">
+                <div class="badge-tag">🔥 新版本开发中...</div>
+                <h1 class="main-title">ToneCanto，一眼看透九声六调</h1>
+                <p class="main-desc">
+                    一次性解锁全部核心学习资源与未来更新，让你的粤语学习投资一劳永逸。
+                </p>
+                <ul class="features-list">
+                    <li class="feature-item">
+                        <div class="icon-permanent">永</div>
+                        <div><strong>例字资源</strong> 150+组精选例字库及持续新增内容</div>
+                    </li>
+                    <li class="feature-item">
+                        <div class="icon-permanent">永</div>
+                        <div><strong>听音辨调</strong> 所有挑战模式与学习报告</div>
+                    </li>
+                    <li class="feature-item">
+                        <div class="icon-permanent">永</div>
+                        <div><strong>发音矫正</strong> 可视化对比你与基础声调的发音</div>
+                    </li>
+                </ul>
+                <div class="statistics">
+                    <div class="stat-item">
+                        <span class="stat-number">900+</span>
+                        <span class="stat-label">例字资源</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">无限次数</span>
+                        <span class="stat-label">听音辨调挑战</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">实时反馈</span>
+                        <span class="stat-label">发音矫正练习</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 右侧订阅区 -->
+            <div class="right-content">
+                <div class="subscribe-section">
+                    <div class="subscribe-header">
+                        <span class="subscribe-icon">📧</span>
+                        <span class="subscribe-title">获取更新通知</span>
+                    </div>
+                    <p class="subscribe-description">
+                        第一时间获取新版本发布通知和功能更新
+                    </p>
+                    <div class="subscribe-form">
+                        <input 
+                            type="email" 
+                            class="subscribe-input" 
+                            placeholder="输入邮箱地址"
+                            value="">
+                        <button class="subscribe-btn">订阅更新</button>
+                    </div>
+                    <div class="subscribe-benefits">
+                        <div class="benefit-item">
+                            <span class="benefit-icon">🚀</span>
+                            <span class="benefit-text">新功能抢先体验</span>
+                        </div>
+                        <div class="benefit-item">
+                            <span class="benefit-icon">🎁</span>
+                            <span class="benefit-text">专属优惠活动</span>
+                        </div>
+                        <div class="benefit-item">
+                            <span class="benefit-icon">📚</span>
+                            <span class="benefit-text">学习资源更新</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="improvements">
+            <h3>✨ 布局改进说明</h3>
+            <ul>
+                <li><strong>左右分布设计</strong>：将原本紧凑的横屏布局改为左右分布，内容显示更完整</li>
+                <li><strong>订阅区域独立</strong>：右侧专门的订阅区域，视觉层次更清晰</li>
+                <li><strong>内容空间扩大</strong>：左侧内容区域更宽敞，文字和功能介绍更易阅读</li>
+                <li><strong>视觉引导优化</strong>：右侧深色背景突出订阅功能，增加转化率</li>
+                <li><strong>响应式适配</strong>：小屏幕设备自动切换为上下布局</li>
+                <li><strong>交互体验提升</strong>：更大的按钮和输入框，更好的触摸体验</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

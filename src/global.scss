@@ -1,0 +1,285 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * Put style rules here that you want to apply globally. These styles are for
+ * the entire app and not just one component. Additionally, this file can be
+ * used as an entry point to import other CSS/Sass files to be included in the
+ * output CSS.
+ * For more information on global stylesheets, visit the documentation:
+ * https://ionicframework.com/docs/layout/global-stylesheets
+ */
+
+/* Core CSS required for Ionic components to work properly */
+@import "@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/display.css";
+
+/* Optional CSS utils that can be commented out */
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+
+/* Driver.js 引导库样式 */
+@import "driver.js/dist/driver.css";
+
+/* Driver.js 自定义样式 - 声调表页面引导 */
+.driver-popover.tone-table-popover {
+  background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5),
+              0 0 40px rgba(59, 130, 246, 0.15);
+  color: white;
+  max-width: 320px;
+  
+  .driver-popover-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 8px;
+  }
+  
+  .driver-popover-description {
+    font-size: 13px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.85);
+  }
+  
+  .driver-popover-progress-text {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  
+  .driver-popover-navigation-btns {
+    gap: 8px;
+  }
+  
+  .driver-popover-prev-btn,
+  .driver-popover-next-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .driver-popover-prev-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+  }
+  
+  .driver-popover-next-btn {
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    color: white;
+    
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+    }
+  }
+  
+  .driver-popover-close-btn {
+    color: rgba(255, 255, 255, 0.6);
+    
+    &:hover {
+      color: white;
+    }
+  }
+}
+
+/* Driver.js 箭头样式 */
+.driver-popover.tone-table-popover {
+  .driver-popover-arrow-side-left.driver-popover-arrow {
+    border-right-color: #1e293b;
+  }
+  
+  .driver-popover-arrow-side-right.driver-popover-arrow {
+    border-left-color: #1e293b;
+  }
+  
+  .driver-popover-arrow-side-top.driver-popover-arrow {
+    border-bottom-color: #1e293b;
+  }
+  
+  .driver-popover-arrow-side-bottom.driver-popover-arrow {
+    border-top-color: #1e293b;
+  }
+}
+
+/**
+ * Ionic Dark Mode
+ * -----------------------------------------------------
+ * For more info, please see:
+ * https://ionicframework.com/docs/theming/dark-mode
+ */
+
+/* @import "@ionic/angular/css/palettes/dark.always.css"; */
+/* @import "@ionic/angular/css/palettes/dark.class.css"; */
+@import '@ionic/angular/css/palettes/dark.system.css';
+
+/**
+ * Android Edge-to-Edge 全屏模式支持
+ * 让内容延伸到底部导航栏/手势区域
+ */
+
+/* 确保 ion-app 填充整个屏幕 */
+ion-app {
+  /* 使用安全区域变量，但允许内容延伸到边缘 */
+  --ion-safe-area-top: env(safe-area-inset-top);
+  --ion-safe-area-bottom: env(safe-area-inset-bottom);
+  --ion-safe-area-left: env(safe-area-inset-left);
+  --ion-safe-area-right: env(safe-area-inset-right);
+}
+
+/* 全屏页面样式 - 内容延伸到底部 */
+ion-content.fullscreen-content,
+ion-content[fullscreen="true"] {
+  --background: #1a1a2e;
+  
+  /* 让内容区域延伸到底部安全区域 */
+  &::part(scroll) {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+}
+
+/* 波形图页面特殊处理 - 背景延伸到底部 */
+.waveform-home,
+.tones-page {
+  --background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  
+  /* 确保背景色延伸到底部导航栏区域 */
+  &::part(background) {
+    bottom: calc(-1 * env(safe-area-inset-bottom, 0));
+  }
+}
+
+/* 波形图容器填充整个屏幕 */
+.waveform-home-container {
+  min-height: 100vh;
+  min-height: 100dvh; /* 动态视口高度，包含底部导航栏 */
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+}
+
+/* ========== 全局主题样式 ========== */
+
+/* 海洋主题（默认） */
+body[data-theme="ocean"] .waveform-home-container {
+  background: linear-gradient(135deg, #0d9488 0%, #06b6d4 50%, #0891b2 100%) !important;
+}
+
+/* 日落主题 */
+body[data-theme="sunset"] .waveform-home-container {
+  background: linear-gradient(135deg, #f59e0b 0%, #ef4444 50%, #dc2626 100%) !important;
+}
+
+/* 森林主题 */
+body[data-theme="forest"] .waveform-home-container {
+  background: linear-gradient(135deg, #22c55e 0%, #10b981 50%, #059669 100%) !important;
+}
+
+/* 紫罗兰主题 */
+body[data-theme="purple"] .waveform-home-container {
+  background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 35%, #a78bfa 65%, #7c3aed 100%) !important;
+}
+
+/* 深夜主题 */
+body[data-theme="night"] .waveform-home-container {
+  background: linear-gradient(135deg, #0c1222 0%, #1e3a5f 35%, #2d4a6f 50%, #1a365d 75%, #0f172a 100%) !important;
+}
+
+/* 玫瑰主题 */
+body[data-theme="rose"] .waveform-home-container {
+  background: linear-gradient(135deg, #be185d 0%, #ec4899 30%, #f472b6 55%, #db2777 80%, #9d174d 100%) !important;
+}
+
+/* 极光主题 */
+body[data-theme="aurora"] .waveform-home-container {
+  background: linear-gradient(135deg, #00d4aa 0%, #06b6d4 25%, #8b5cf6 50%, #7c3aed 75%, #4c1d95 100%) !important;
+}
+
+/* 樱花主题 */
+body[data-theme="cherry"] .waveform-home-container {
+  background: linear-gradient(135deg, #fda4af 0%, #fb7185 30%, #f472b6 60%, #ec4899 100%) !important;
+}
+
+/* 午夜主题 */
+body[data-theme="midnight"] .waveform-home-container {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 35%, #4338ca 60%, #3730a3 80%, #1e1b4b 100%) !important;
+}
+
+/* 余烬主题 */
+body[data-theme="ember"] .waveform-home-container {
+  background: linear-gradient(135deg, #7c2d12 0%, #c2410c 30%, #ea580c 55%, #f97316 80%, #9a3412 100%) !important;
+}
+
+/* 冰川主题 */
+body[data-theme="arctic"] .waveform-home-container {
+  background: linear-gradient(135deg, #0284c7 0%, #0ea5e9 30%, #38bdf8 55%, #67e8f9 80%, #06b6d4 100%) !important;
+}
+
+/* 苔藓主题 */
+body[data-theme="moss"] .waveform-home-container {
+  background: linear-gradient(135deg, #365314 0%, #4d7c0f 30%, #65a30d 55%, #84cc16 80%, #3f6212 100%) !important;
+}
+
+/* 象牙白主题 - 柔和优雅的白色系 */
+body[data-theme="ivory"] .waveform-home-container {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 25%, #e2e8f0 50%, #cbd5e1 75%, #f1f5f9 100%) !important;
+}
+
+/* 象牙白主题 - 文字颜色调整 */
+body[data-theme="ivory"] .waveform-home-container {
+  .char-text, .jyutping-text, .meaning-text {
+    fill: #334155 !important;
+  }
+  
+  .tone-label {
+    fill: #475569 !important;
+  }
+  
+  .waveform-path {
+    stroke: #3b82f6 !important;
+  }
+  
+  .char-marker-line {
+    stroke: #94a3b8 !important;
+  }
+}
+
+/* 薰衣草主题 - 柔和浪漫的紫色 */
+body[data-theme="lavender"] .waveform-home-container {
+  background: linear-gradient(135deg, #ddd6fe 0%, #c4b5fd 30%, #a78bfa 60%, #8b5cf6 100%) !important;
+}
+
+/* 珊瑚主题 - 温暖活力的橙色 */
+body[data-theme="coral"] .waveform-home-container {
+  background: linear-gradient(135deg, #fed7aa 0%, #fdba74 25%, #fb923c 50%, #f97316 75%, #ea580c 100%) !important;
+}
+
+/* 青碧主题 - 清新自然的青绿色 */
+body[data-theme="teal"] .waveform-home-container {
+  background: linear-gradient(135deg, #5eead4 0%, #2dd4bf 30%, #14b8a6 60%, #0d9488 100%) !important;
+}
+
+/* 酒红主题 - 深沉优雅的红色 */
+body[data-theme="wine"] .waveform-home-container {
+  background: linear-gradient(135deg, #4c0519 0%, #881337 30%, #be123c 60%, #e11d48 100%) !important;
+}
+
+/* 石板灰主题 - 沉稳内敛的灰色 */
+body[data-theme="slate"] .waveform-home-container {
+  background: linear-gradient(135deg, #334155 0%, #475569 30%, #64748b 60%, #94a3b8 100%) !important;
+}

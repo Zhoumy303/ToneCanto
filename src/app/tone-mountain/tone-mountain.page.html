@@ -1,0 +1,97 @@
+<ion-content class="tone-mountain-page" [fullscreen]="true">
+  <div class="mountain-container">
+    <!-- 3D 画布 -->
+    <canvas #mountainCanvas class="mountain-canvas"></canvas>
+    
+    <!-- 顶部工具栏 -->
+    <div class="top-toolbar">
+      <button class="back-btn" (click)="goBack()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      <span class="page-title">你打开我们的彩蛋了：🏔️ 声调山脉</span>
+      <button class="toggle-btn" (click)="toggleControls()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+    </div>
+    
+    <!-- 操作提示 -->
+    <div class="interaction-hints">
+      <div class="hint-item">
+        <span class="hint-icon">👆</span>
+        <span class="hint-text">拖动旋转</span>
+      </div>
+      <div class="hint-item">
+        <span class="hint-icon">🤏</span>
+        <span class="hint-text">捏合缩放</span>
+      </div>
+    </div>
+    
+    <!-- 声调选择器 -->
+    <div class="tone-selector" [class.hidden]="!showControls">
+      <button *ngFor="let tone of tonesData"
+              class="tone-btn"
+              [class.active]="selectedTone === tone.number"
+              [style.--tone-color]="tone.color"
+              (click)="selectToneByNumber(tone.number)">
+        <span class="tone-char">{{ tone.char }}</span>
+        <span class="tone-num">{{ tone.number }}</span>
+      </button>
+    </div>
+    
+    <!-- 底部控制栏 -->
+    <div class="bottom-controls" [class.hidden]="!showControls">
+      <button class="control-btn fly-btn" 
+              [class.active]="isFlying"
+              (click)="isFlying ? stopFlying() : startFlying()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+        </svg>
+        <span>{{ isFlying ? '停止飞行' : '飞行模式' }}</span>
+      </button>
+      
+      <button class="control-btn reset-btn" (click)="resetView()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+          <path d="M3 3v5h5"/>
+        </svg>
+        <span>重置视角</span>
+      </button>
+    </div>
+    
+    <!-- 飞行模式信息 -->
+    <div class="flying-info" *ngIf="isFlying">
+      <div class="flying-tone" *ngIf="tonesData[currentFlyTone]">
+        <span class="flying-char" [style.color]="tonesData[currentFlyTone].color">
+          {{ tonesData[currentFlyTone].char }}
+        </span>
+        <span class="flying-name">
+          第{{ tonesData[currentFlyTone].number }}声 {{ tonesData[currentFlyTone].name }}
+        </span>
+      </div>
+      <div class="flying-progress">
+        <div class="progress-bar">
+          <div class="progress-fill" 
+               [style.width]="((currentFlyTone + flyProgress) / tonesData.length * 100) + '%'">
+          </div>
+        </div>
+        <span class="progress-text">{{ currentFlyTone + 1 }} / {{ tonesData.length }}</span>
+      </div>
+    </div>
+    
+    <!-- 声调图例 -->
+    <div class="tone-legend" [class.hidden]="isFlying">
+      <div class="legend-title">音高走向</div>
+      <div class="legend-items">
+        <div class="legend-item" *ngFor="let tone of tonesData">
+          <div class="legend-color" [style.background]="tone.color"></div>
+          <span class="legend-text">{{ tone.number }}声 {{ tone.pattern }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>

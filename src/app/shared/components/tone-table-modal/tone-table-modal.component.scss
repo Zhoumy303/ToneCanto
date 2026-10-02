@@ -1,0 +1,265 @@
+.tone-table-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+}
+
+.tone-table-modal-content {
+  position: relative;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  padding: 20px;
+  max-width: 90vw;
+  max-height: 85vh;
+  overflow: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.modal-close-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  transition: all 0.2s;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.2);
+    color: #1e293b;
+  }
+}
+
+.tones-table-container {
+  overflow-x: auto;
+}
+
+.tones-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+
+  th, td {
+    padding: 10px 12px;
+    text-align: center;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .table-header {
+    background: rgba(0, 0, 0, 0.05);
+    font-weight: 600;
+    color: #475569;
+    min-width: 50px;
+  }
+
+  .tone-column,
+  .tone-number-cell,
+  .tone-value-cell,
+  .pitch-cell {
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 60px;
+
+    &:hover {
+      background: rgba(var(--tone-color-rgb), 0.1);
+    }
+
+    &.selected {
+      background: rgba(var(--tone-color-rgb), 0.2);
+      font-weight: 600;
+    }
+  }
+
+  .tone-column {
+    font-weight: 600;
+    color: var(--tone-color);
+  }
+
+  .tone-number-cell {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--tone-color);
+  }
+
+  .tone-value-cell {
+    font-family: monospace;
+    color: #64748b;
+  }
+
+  .pitch-scale {
+    font-size: 12px;
+    color: #94a3b8;
+  }
+}
+
+.pitch-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.1);
+  margin: 0 auto;
+  transition: all 0.2s;
+
+  &.active {
+    background: var(--tone-color);
+    box-shadow: 0 0 8px rgba(var(--tone-color-rgb), 0.5);
+  }
+}
+
+// 为升调和降调添加斜线 - 只在第一个音高行显示
+.pitch-row.pitch-5 {
+  .pitch-cell[data-tone="2"],
+  .pitch-cell[data-tone="4"],
+  .pitch-cell[data-tone="5"] {
+    position: relative;
+    overflow: visible;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      background: var(--tone-color);
+      border-radius: 2px;
+      box-shadow: 0 0 6px rgba(var(--tone-color-rgb), 0.5);
+      pointer-events: none;
+      z-index: 1;
+    }
+  }
+  
+  // 调序2 (35) - 从音高3升到音高5，斜向上
+  .pitch-cell[data-tone="2"]::after {
+    width: 6px;
+    height: calc(300% + 20px);
+    top: 0;
+    transform: translateX(-50%) rotate(15deg);
+    transform-origin: top center;
+  }
+  
+  // 调序4 (21) - 从音高2降到音高1，斜向下
+  .pitch-cell[data-tone="4"]::after {
+    width: 4px;
+    height: calc(200% + 10px);
+    top: calc(300% + 20px);
+    transform: translateX(-50%) rotate(-15deg);
+    transform-origin: top center;
+  }
+  
+  // 调序5 (13) - 从音高1升到音高3，斜向上
+  .pitch-cell[data-tone="5"]::after {
+    width: 4px;
+    height: calc(300% + 20px);
+    top: calc(200% + 10px);
+    transform: translateX(-50%) rotate(15deg);
+    transform-origin: top center;
+  }
+}
+
+// 隐藏升调和降调的多个点
+.pitch-cell[data-tone="2"],
+.pitch-cell[data-tone="4"],
+.pitch-cell[data-tone="5"] {
+  .pitch-indicator.active {
+    display: none;
+  }
+}
+
+.modal-footer {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.modal-note {
+  font-size: 12px;
+  color: #94a3b8;
+  text-align: center;
+  margin: 0;
+}
+
+// 高亮字覆盖层
+.highlight-char-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  cursor: pointer;
+}
+
+.highlight-char-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  animation: fadeInScale 0.3s ease;
+}
+
+.highlight-char {
+  font-size: 80px;
+  font-weight: bold;
+  color: var(--tone-color);
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.highlight-jyutping {
+  font-size: 24px;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+}
+
+.highlight-tone-name {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

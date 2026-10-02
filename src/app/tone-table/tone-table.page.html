@@ -1,0 +1,286 @@
+<ion-content class="tone-table-page" [fullscreen]="true">
+  <div class="tone-table-container">
+    <!-- 顶部标题栏 -->
+    <div class="page-header">
+      <button class="back-btn" (click)="goBack()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      <span class="page-title">粤语声调表</span>
+      <button class="help-btn" (click)="openGuideModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+          <path d="M12 17h.01"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- 声调介绍 -->
+    <div class="tone-introduction">
+      <div class="intro-card">
+        <div class="intro-content">
+          <p class="intro-text">
+            <strong>"九声六调"体系</strong>是粤语声调的基础框架。通常用数字1-6（或1-9）来标注。从高频词汇入手，建立<strong>"音-调-义"</strong>的强关联，而不是死记抽象规则。
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 声调表格 -->
+    <div class="tones-table-container">
+      <table class="tones-table">
+        <thead>
+          <tr>
+            <th class="table-header clickable" (click)="onToneHeaderClick($event)">调名</th>
+            @for (tone of tonesData(); track tone.number) {
+              <th class="tone-column"
+                  [class.selected]="selectedTone() === tone.number"
+                  [attr.data-tone]="tone.number"
+                  [style.--tone-color]="tone.color"
+                  [style.--tone-color-rgb]="toneColorRgb()[tone.number]"
+                  (click)="selectTone(tone.number)">
+                {{ tone.name.split(' / ')[1] }}
+              </th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="table-header clickable" (click)="onToneHeaderClick($event)">调序</td>
+            @for (tone of tonesData(); track tone.number) {
+              <td class="tone-number-cell"
+                  [class.selected]="selectedTone() === tone.number"
+                  [attr.data-tone]="tone.number"
+                  [style.--tone-color]="tone.color"
+                  [style.--tone-color-rgb]="toneColorRgb()[tone.number]"
+                  (click)="selectTone(tone.number)">
+                {{ tone.number }}
+              </td>
+            }
+          </tr>
+
+          <tr>
+            <td class="table-header clickable" (click)="onToneHeaderClick($event)">调值</td>
+            @for (tone of tonesData(); track tone.number) {
+              <td class="tone-value-cell"
+                  [class.selected]="selectedTone() === tone.number"
+                  [attr.data-tone]="tone.number"
+                  [style.--tone-color]="tone.color"
+                  [style.--tone-color-rgb]="toneColorRgb()[tone.number]"
+                  (click)="selectTone(tone.number)">
+                {{ getToneValue(tone.number) }}
+              </td>
+            }
+          </tr>
+
+          <!-- 音高行 5-1 -->
+          @for (pitch of [5, 4, 3, 2, 1]; track pitch) {
+            <tr class="pitch-row" [class]="'pitch-' + pitch">
+              <td class="table-header pitch-scale clickable" (click)="onPitchScaleClick($event)">{{ pitch }}</td>
+              @for (tone of tonesData(); track tone.number) {
+                <td class="pitch-cell"
+                    [class.selected]="selectedTone() === tone.number"
+                    [attr.data-tone]="tone.number"
+                    [style.--tone-color]="tone.color"
+                    [style.--tone-color-rgb]="toneColorRgb()[tone.number]">
+                  <div class="pitch-indicator" [class.active]="isPitchActive(tone.number, pitch)"></div>
+                </td>
+              }
+            </tr>
+          }
+
+          <!-- 例字行 -->
+          <tr class="example-row">
+            <td class="table-header example-header clickable" 
+                [class.playing]="isPlayingAllExamples()"
+                (click)="playAllExamples($event)">
+              @if (isPlayingAllExamples()) {
+                <span class="stop-icon">■</span>
+              } @else {
+                例字
+              }
+            </td>
+            @for (tone of tonesData(); track tone.number) {
+              <td class="example-cell"
+                  [class.selected]="selectedTone() === tone.number"
+                  [class.highlighting]="highlightToneNumber() === tone.number"
+                  [attr.data-tone]="tone.number"
+                  [style.--tone-color]="tone.color"
+                  [style.--tone-color-rgb]="toneColorRgb()[tone.number]">
+                <!-- 高亮显示区域 -->
+                @if (highlightToneNumber() === tone.number && highlightChar()) {
+                  <div class="inline-highlight">
+                    <span class="highlight-char-inline">{{ highlightChar() }}</span>
+                    <span class="highlight-jyutping-inline">{{ highlightJyutping() }}</span>
+                  </div>
+                } @else {
+                  <div class="example-chars">
+                    @for (example of getExamplesForTone(tone.number); track $index) {
+                      <span class="example-char" (click)="playExample(tone.number, $index)">{{ example.char }}</span>
+                    }
+                  </div>
+                }
+              </td>
+            }
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 底部提示 -->
+    <div class="page-footer">
+      <p class="footer-note">粤语的九声六调中有三个的发音音高和另外六个声调的音高没有差别。为了方便学习，我们可以就学这六个声调。点击例字可播放发音</p>
+    </div>
+
+    <!-- 五度说明弹窗 -->
+    @if (showFiveScaleModal()) {
+      <div class="five-scale-modal-overlay" (click)="closeFiveScaleModal()">
+        <div class="five-scale-modal" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <div class="modal-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 16v-4M12 8h.01"/>
+              </svg>
+            </div>
+            <h2 class="modal-title">什么是"五度标记法"？</h2>
+            <button class="modal-close" (click)="closeFiveScaleModal()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 6L6 18M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          
+          <div class="modal-body">
+            <div class="key-point">
+              <div class="key-icon">💡</div>
+              <p class="key-text">
+                五度的本质作用在于区分声调之间的<strong>相对音高关系</strong>，而并非指定某个绝对高度，让你发出那个高度的声音。
+              </p>
+            </div>
+            <div class="explanation-section">
+              <h3 class="section-title">为什么是"相对"音高？</h3>
+              <div class="comparison-cards">
+                <div class="comparison-card">
+                  <div class="card-icon">👨</div>
+                  <p class="card-text">男性说话音调通常较低</p>
+                </div>
+                <div class="comparison-card">
+                  <div class="card-icon">👩</div>
+                  <p class="card-text">女性说话音调通常较高</p>
+                </div>
+              <p class="section-text highlight-box">
+                但他们说同一个声调时，<strong>相对高低的变化模式是一致的</strong>。这就是"相对音高"的含义——重要的是音高的变化趋势和相对位置，而非绝对频率。
+              </p>                
+              </div>
+            </div>
+
+            <div class="tip-section">
+              <div class="tip-icon">🎯</div>
+              <p class="tip-text">
+                学习声调时，不必纠结于发出某个"标准"的音高，而是要掌握各声调之间的<strong>高低对比</strong>和<strong>升降走向</strong>。
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- 声调分类说明弹窗 -->
+    @if (showToneClassificationModal()) {
+      <div class="tone-classification-modal-overlay" (click)="closeToneClassificationModal()">
+        <div class="tone-classification-modal" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <div class="modal-icon classification-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 6h16M4 12h16M4 18h16"/>
+              </svg>
+            </div>
+            <h2 class="modal-title">声调分类与识别技巧</h2>
+            <button class="modal-close" (click)="closeToneClassificationModal()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 6L6 18M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          
+          <div class="modal-body classification-body">
+            <!-- 核心要点 -->
+            <div class="key-point classification-key">
+              <div class="key-icon">🎯</div>
+              <p class="key-text">
+                区分声调只需搞清楚<strong>两个问题</strong>：
+                ① 区分<span class="type-flat">平</span>、<span class="type-rising">升</span>、<span class="type-falling">降</span>三种调型
+                ② 在平调里区分高、中、低；在升调中区分高升、低升
+              </p>
+            </div>
+
+            <!-- 三大分类 -->
+            <div class="tone-categories">
+              <!-- 平调 -->
+              <div class="category-card flat-category clickable-card" (click)="playToneCategory('flat', $event)">
+                <div class="category-header">
+                  <span class="category-icon">━</span>
+                  <h3 class="category-title">平调</h3>
+                  <span class="category-tones">第1、3、6声</span>
+                  <span class="play-hint">🔊</span>
+                </div>
+                <div class="category-content">
+                  <div class="tone-chips">
+                    <span class="tone-chip tone-1">1声 (55) 高平</span>
+                    <span class="tone-chip tone-3">3声 (33) 中平</span>
+                    <span class="tone-chip tone-6">6声 (22) 低平</span>
+                  </div>
+                  <p class="category-desc">音高保持平稳，不升不降。区分关键在于<strong>高、中、低</strong>三个音高层次。用手轻轻按住喉结，感觉它的位置。</p>
+                </div>
+              </div>
+
+              <!-- 升调 -->
+              <div class="category-card rising-category clickable-card" (click)="playToneCategory('rising', $event)">
+                <div class="category-header">
+                  <span class="category-icon">↗</span>
+                  <h3 class="category-title">升调</h3>
+                  <span class="category-tones">第2、5声</span>
+                  <span class="play-hint">🔊</span>
+                </div>
+                <div class="category-content">
+                  <div class="tone-chips">
+                    <span class="tone-chip tone-2">2声 (35) 高升</span>
+                    <span class="tone-chip tone-5">5声 (13) 低升</span>
+                  </div>
+                  <p class="category-desc">音高由低向高上扬。区分关键在于<strong>起点高低</strong>：2声从中音起，5声从低音起。</p>
+                </div>
+              </div>
+
+              <!-- 降调 -->
+              <div class="category-card falling-category clickable-card" (click)="playToneCategory('falling', $event)">
+                <div class="category-header">
+                  <span class="category-icon">↘</span>
+                  <h3 class="category-title">降调</h3>
+                  <span class="category-tones">第4声</span>
+                  <span class="play-hint">🔊</span>
+                </div>
+                <div class="category-content">
+                  <div class="tone-chips">
+                    <span class="tone-chip tone-4">4声 (21) 低降</span>
+                  </div>
+                  <p class="category-desc">本质上也是平调，但普通人发最低音时难以一下到达，所以产生了21的调值。</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 学习建议 -->
+            <div class="tip-section classification-tip">
+              <div class="tip-icon">💡</div>
+              <p class="tip-text">
+                <strong>分类记忆法</strong>：先用"平、升、降"三分法快速归类，再细分高低。这比死记6个声调的调值更高效！
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</ion-content>

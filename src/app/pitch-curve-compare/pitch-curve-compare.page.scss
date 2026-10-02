@@ -1,0 +1,257 @@
+.pitch-curve-compare-page {
+  --background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  --text-color: rgba(255, 255, 255, 0.9);
+  --border-color: rgba(255, 255, 255, 0.1);
+  --hover-bg: rgba(255, 255, 255, 0.05);
+  --card-bg: rgba(255, 255, 255, 0.03);
+
+  background: var(--background);
+  color: var(--text-color);
+}
+
+.pitch-curve-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+// ========== 顶部标题栏 ==========
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+
+.back-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.page-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+}
+
+.header-spacer {
+  width: 36px;
+}
+
+// ========== 加载和错误状态 ==========
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  gap: 16px;
+
+  ion-spinner {
+    --color: #3b82f6;
+  }
+}
+
+.loading-text {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+.error-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: rgba(239, 68, 68, 0.15);
+  border-left: 4px solid #ef4444;
+  margin: 16px;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+}
+
+.error-icon {
+  font-size: 24px;
+  color: #ef4444;
+  flex-shrink: 0;
+}
+
+.error-text {
+  font-size: 14px;
+  color: #ef4444;
+  margin: 0;
+  flex: 1;
+}
+
+// ========== 音高对比组件包装器 ==========
+
+.pitch-compare-wrapper {
+  flex: 1;
+  overflow: auto;
+  background: var(--card-bg);
+}
+
+// ========== 底部信息栏 ==========
+
+.info-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  flex-shrink: 0;
+  gap: 16px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+
+  ion-icon {
+    font-size: 18px;
+    color: #60a5fa;
+  }
+
+  span {
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.8);
+  }
+}
+
+// ========== 响应式设计 ==========
+
+@media (max-width: 768px) {
+  .page-header {
+    padding: 8px 12px;
+  }
+
+  .back-btn {
+    width: 32px;
+    height: 32px;
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  .page-title {
+    font-size: 14px;
+  }
+
+  .info-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+
+  .info-item {
+    font-size: 12px;
+
+    ion-icon {
+      font-size: 16px;
+    }
+  }
+}
+
+/* 横屏适配 */
+@media (orientation: landscape) {
+  .page-header {
+    padding: 4px 12px;
+    margin-bottom: 8px;
+  }
+
+  .back-btn {
+    width: 32px;
+    height: 32px;
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  .page-title {
+    font-size: 14px;
+  }
+
+  .info-bar {
+    padding: 8px 12px;
+  }
+
+  .info-item {
+    font-size: 11px;
+
+    ion-icon {
+      font-size: 16px;
+    }
+  }
+}
+
+/* 小屏幕适配 */
+@media (max-height: 400px) {
+  .page-header {
+    padding: 4px 12px;
+    margin-bottom: 6px;
+  }
+
+  .back-btn {
+    width: 28px;
+    height: 28px;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  .page-title {
+    font-size: 13px;
+  }
+
+  .info-bar {
+    padding: 6px 12px;
+  }
+
+  .info-item {
+    font-size: 10px;
+
+    ion-icon {
+      font-size: 14px;
+    }
+  }
+}
